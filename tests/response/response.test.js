@@ -197,3 +197,20 @@ test('error bodies never contain stack traces or driver internals', async () => 
     assert.equal(text.includes('ValidationError'), false);
   }
 });
+
+test('expense payloads never expose internal mongoose fields', async () => {
+  const { token } = await registerUser();
+  const created = await createExpense(token);
+  const expenseId = created.body.data.expense.id;
+
+  const responses = [
+    created,
+    await get('/expenses', { token }),
+    await get(`/expenses/${expenseId}`, { token }),
+    await patch(`/expenses/${expenseId}`, { token, body: { title: 'Still clean' } }),
+  ];
+
+  for (const res of responses) {
+    assert.equal(JSON.stringify(res.body).includes('"__v"'), false);
+  }
+});
