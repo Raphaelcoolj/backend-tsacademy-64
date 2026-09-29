@@ -1,4 +1,5 @@
 const { sendError } = require('../utils/response');
+const { isEmpty } = require('../utils/rules');
 
 // Returns { fieldName: "message" } so frontends can map errors to inputs.
 function collectErrors(source, rules) {
@@ -41,4 +42,37 @@ function validateParams(rules) {
   };
 }
 
-module.exports = { validateBody, validateParams };
+// Validates req.query (query string) against a rule map.
+// Usage: router.get('/', validateQuery({ status: [optional(oneOf(EXPENSE_STATUSES))] }), handler)
+function validateQuery(rules) {
+  return (req, res, next) => {
+    const errors = collectErrors(req.query || {}, rules);
+    if (Object.keys(errors).length > 0) {
+      return sendError(res, 'Validation failed', 400, errors);
+    }
+    return next();
+  };
+}
+
+// Copies accepted aliases into their canonical body field before validation,
+// so clients may send either name but rules and handlers see one name only.
+// Usage: normalizeBody({ expenseDate: ['date'], rejectionReason: ['reason'] })
+function normalizeBody(aliases) {
+  return (req, res, next) => {
+    const body = req.body;
+    if (!body || typeof body !== 'object') return next();
+
+    for (const [canonical, aliasNames] of Object.entries(aliases)) {
+      if (!isEmpty(body[canonical])) continue;
+      for (const alias of aliasNames) {
+        if (!isEmpty(body[alias])) {
+          body[canonical] = body[alias];
+          break;
+        }
+      }
+    }
+    return next();
+  };
+}
+
+module.exports = { validateBody, validateParams, validateQuery, normalizeBody };

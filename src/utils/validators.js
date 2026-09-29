@@ -1,5 +1,17 @@
 const { ROLES } = require('../models/User');
-const { required, string, email, minLength, maxLength, oneOf, optional } = require('./rules');
+const { EXPENSE_STATUSES } = require('./constants');
+const {
+  required,
+  string,
+  email,
+  minLength,
+  maxLength,
+  number,
+  greaterThan,
+  oneOf,
+  date,
+  optional,
+} = require('./rules');
 
 // Rule maps for the auth endpoints. Consumed by validateBody() in the routes.
 const registerRules = {
@@ -14,4 +26,42 @@ const loginRules = {
   password: [required()],
 };
 
-module.exports = { registerRules, loginRules };
+// status / submittedBy / reviewedBy are deliberately absent: clients can never
+// submit them. The service picks only the fields listed here.
+const createExpenseRules = {
+  title: [required(), string(), maxLength(120)],
+  amount: [required(), number(), greaterThan(0)],
+  category: [required(), string(), maxLength(60)],
+  expenseDate: [required(), date()],
+  description: [optional(string(), maxLength(500))],
+  receiptDetails: [optional(string(), maxLength(1000))],
+};
+
+// Partial update: every field optional, but any value sent must be valid.
+const updateExpenseRules = {
+  title: [optional(string(), minLength(1), maxLength(120))],
+  amount: [optional(number(), greaterThan(0))],
+  category: [optional(string(), minLength(1), maxLength(60))],
+  expenseDate: [optional(date())],
+  description: [optional(string(), maxLength(500))],
+  receiptDetails: [optional(string(), maxLength(1000))],
+};
+
+const listExpenseRules = {
+  status: [optional(oneOf(EXPENSE_STATUSES))],
+  page: [optional(number(), greaterThan(0))],
+  limit: [optional(number(), greaterThan(0))],
+};
+
+const rejectExpenseRules = {
+  rejectionReason: [required(), string(), minLength(3), maxLength(500)],
+};
+
+module.exports = {
+  registerRules,
+  loginRules,
+  createExpenseRules,
+  updateExpenseRules,
+  listExpenseRules,
+  rejectExpenseRules,
+};

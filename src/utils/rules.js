@@ -121,6 +121,7 @@ function optional(...rules) {
 module.exports = {
   EMAIL_REGEX,
   MONGO_ID_REGEX,
+  isEmpty,
   required,
   string,
   email,
