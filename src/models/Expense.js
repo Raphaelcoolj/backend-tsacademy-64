@@ -71,8 +71,15 @@ const expenseSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-expenseSchema.set('toJSON', { virtuals: true });
-expenseSchema.set('toObject', { virtuals: true });
+// Serialize without the internal mongoose version key — it is not part of the
+// public API contract.
+function stripInternalFields(_doc, ret) {
+  delete ret.__v;
+  return ret;
+}
+
+expenseSchema.set('toJSON', { virtuals: true, transform: stripInternalFields });
+expenseSchema.set('toObject', { virtuals: true, transform: stripInternalFields });
 
 const Expense = mongoose.model('Expense', expenseSchema);
 
