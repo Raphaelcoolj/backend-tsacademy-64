@@ -1,5 +1,9 @@
 const { ROLES } = require('../models/User');
-const { EXPENSE_STATUSES } = require('./constants');
+const {
+  EXPENSE_STATUSES,
+  EXPENSE_SORT_FIELDS,
+  SORT_ORDERS,
+} = require('./constants');
 const {
   required,
   string,
@@ -11,6 +15,7 @@ const {
   oneOf,
   date,
   optional,
+  notAfter,
 } = require('./rules');
 
 // Rule maps for the auth endpoints. Consumed by validateBody() in the routes.
@@ -47,8 +52,16 @@ const updateExpenseRules = {
   receiptDetails: [optional(string(), maxLength(1000))],
 };
 
+// GET /api/expenses query rules. Unknown params are ignored by design;
+// anything present must still be valid. `notAfter` rejects inverted ranges
+// (fromDate after toDate) on the fromDate field.
 const listExpenseRules = {
   status: [optional(oneOf(EXPENSE_STATUSES))],
+  category: [optional(string(), maxLength(60))],
+  fromDate: [optional(date(), notAfter('toDate'))],
+  toDate: [optional(date())],
+  sortBy: [optional(oneOf(Object.keys(EXPENSE_SORT_FIELDS)))],
+  sortOrder: [optional(oneOf(SORT_ORDERS))],
   page: [optional(number(), greaterThan(0))],
   limit: [optional(number(), greaterThan(0))],
 };
