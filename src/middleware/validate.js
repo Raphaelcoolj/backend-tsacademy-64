@@ -1,14 +1,15 @@
 const { sendError } = require('../utils/response');
 
+// Returns { fieldName: "message" } so frontends can map errors to inputs.
 function collectErrors(source, rules) {
-  const errors = [];
+  const errors = {};
 
   for (const [field, fieldRules] of Object.entries(rules)) {
     for (const rule of fieldRules) {
       const message = rule(source[field], source);
       if (message) {
-        errors.push({ field, message });
-        break; // one clear error per field is enough
+        errors[field] = message; // one clear error per field is enough
+        break;
       }
     }
   }
@@ -21,7 +22,7 @@ function collectErrors(source, rules) {
 function validateBody(rules) {
   return (req, res, next) => {
     const errors = collectErrors(req.body || {}, rules);
-    if (errors.length > 0) {
+    if (Object.keys(errors).length > 0) {
       return sendError(res, 'Validation failed', 400, errors);
     }
     return next();
@@ -33,7 +34,7 @@ function validateBody(rules) {
 function validateParams(rules) {
   return (req, res, next) => {
     const errors = collectErrors(req.params || {}, rules);
-    if (errors.length > 0) {
+    if (Object.keys(errors).length > 0) {
       return sendError(res, 'Validation failed', 400, errors);
     }
     return next();
