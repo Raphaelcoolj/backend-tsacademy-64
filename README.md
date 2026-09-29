@@ -205,10 +205,10 @@ npm test
 - Tests talk to **your local MongoDB** on the dedicated database `expense-approval-test`
   (derived from `MONGODB_URI`; it is dropped before/after the run).
   Your development data in `expense-approval` is **never** touched.
-- **116 tests** cover authentication, authorization, validation, expense CRUD,
+- **117 tests** cover authentication, authorization, validation, expense CRUD,
   ownership isolation, filtering/sorting/pagination, approval state transitions,
   response shape and security rules.
-- Expected result: `# pass 116` / `# fail 0`.
+- Expected result: `# pass 117` / `# fail 0`.
 
 ---
 
@@ -1287,4 +1287,4 @@ curl $BASE/api/expenses/$EXPENSE_ID -H "Authorization: Bearer $EMP_TOKEN"
 npm test
 ```
 
-`116` tests across `tests/` (auth, authorization, validation, expenses, listing/isolation, approval, response shape, security). They run against a local MongoDB database named `expense-approval-test`, which is dropped before and after the run. Run the suite before merging any change.
+`117` tests across `tests/` (auth, authorization, validation, expenses, listing/isolation, approval, response shape, security). They run against a local MongoDB database named `expense-approval-test`, which is dropped before and after the run. Run the suite before merging any change.
