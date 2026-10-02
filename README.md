@@ -157,6 +157,7 @@ cp .env.example .env
 | `MONGODB_URI` | no* | MongoDB connection string | `mongodb://127.0.0.1:27017/expense-approval` |
 | `JWT_SECRET` | **yes** | Secret that signs/verify JWTs | long random string |
 | `JWT_EXPIRES_IN` | no | Token lifetime (default `1d`) | `1d`, `12h`, `7d` |
+| `CORS_ORIGIN` | no | Comma-separated allow-list of frontend origins (CORS). Unset = any origin | `http://localhost:5173` |
 
 \* Falls back to `mongodb://127.0.0.1:27017/expense-approval` if unset.
 

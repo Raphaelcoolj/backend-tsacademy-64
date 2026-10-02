@@ -8,6 +8,14 @@ const config = {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN || '1d',
   },
+  // Comma-separated allow-list of browser origins allowed to call the API
+  // (CORS). Empty → any origin. Example: http://localhost:5173
+  cors: {
+    origin: (process.env.CORS_ORIGIN || '')
+      .split(',')
+      .map((value) => value.trim())
+      .filter(Boolean),
+  },
 };
 
 function assertConfig() {
