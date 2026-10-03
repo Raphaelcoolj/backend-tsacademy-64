@@ -8,6 +8,19 @@ const config = {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN || '1d',
   },
+  // Comma-separated allow-list of browser origins allowed to call the API
+  // (CORS). Empty or containing '*' → any origin. Example: http://localhost:5173
+  cors: {
+    origin: (() => {
+      const allowList = (process.env.CORS_ORIGIN || '')
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean);
+      // The cors package only treats the bare string '*' as a wildcard —
+      // ['*'] would be matched literally and allow nothing.
+      return allowList.includes('*') ? '*' : allowList;
+    })(),
+  },
 };
 
 function assertConfig() {
